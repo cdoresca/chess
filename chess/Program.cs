@@ -7,6 +7,6 @@ internal class Program
     {
         Game game;
         game = new Game();
-        game.run();   
+        game.run();
     }
 }

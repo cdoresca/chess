@@ -1,34 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace chess.Piece
+﻿namespace chess.Piece
 {
     internal class Roi : PieceBase
     {
-        public Roi(string name, Case pos, Color color) : base(name, pos, color)
+        public Roi(string name, (int, int) pos, Color color, bool life = true) : base(name, pos, color, life)
         {
         }
 
-        public override List<(int, int)> mouvement()
+        private List<(int, int)> mouvement()
         {
-            List<(int,int)> list = new List<(int, int)>();
+            List<(int, int)> list = new List<(int, int)>();
 
-            int x = position.getIndex()[0];
-            int y = position.getIndex()[1];
+            int row = position.row;
+            int col = position.col;
 
-            int[] index= new int[]{-1,0,1};
+            int[] index = { -1, 0, 1 };
 
-            foreach(int i in index)
+            foreach (int i in index)
             {
-                foreach(int j in index)
+                foreach (int j in index)
                 {
-                    if(i!=0 || j != 0)
+                    if (i != 0 || j != 0)
                     {
-                        int nx = i+ x;
-                        int ny = j + y;
+                        int nx = i + row;
+                        int ny = j + col;
 
                         if ((0 <= nx && nx < 8) && (0 <= ny && ny < 8))
                         {
@@ -42,18 +36,17 @@ namespace chess.Piece
             return list;
         }
 
-        public override List<(int, int)> mouvementGrid(Grid grid)
+        public override List<(int, int)> generateMove(GameState state)
         {
             List<(int, int)> list = new List<(int, int)>();
-            int x = position.getIndex()[0];
-            int y = position.getIndex()[1];
+
 
             foreach (var (i, j) in mouvement())
             {
-                if (grid.getGrid()[i, j].empty()) { list.Add((i, j)); }
-                if (!grid.getGrid()[i, j].empty())
+                if (state.board.grid[i, j].empty()) { list.Add((i, j)); }
+                if (!state.board.grid[i, j].empty())
                 {
-                    if (grid.getGrid()[i, j].getPiece().GetColor() != color)
+                    if (state.board.grid[i, j].piece.color != color)
                     {
                         list.Add((i, j));
                     }
@@ -61,18 +54,15 @@ namespace chess.Piece
             }
             return list;
         }
-
-        public override List<(int, int)> MouvementToCase(Case next, Grid grid)
+        public override PieceBase cloneWith(Move move)
         {
-            List<(int, int)> list = new List<(int, int)>();
-            int x = position.getIndex()[0];
-            int y = position.getIndex()[1];
+            (int row, int col) pos = move.To;
+            return new Roi(name, pos, color, alive);
+        }
 
-            foreach (var (i, j) in mouvementGrid(grid))
-            {
-                if (grid.getGrid()[i, j] == next) { list.Add((i, j)); return list; }
-            }
-            return null;
+        public override PieceBase clone()
+        {
+            return new Roi(name, position, color, alive);
         }
     }
 }

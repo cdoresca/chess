@@ -1,68 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using chess.util;
-
-namespace chess.Piece
+﻿namespace chess.Piece
 {
     internal class Reine : PieceBase
     {
-        Fou fou;
-        Tour tour;
-        public Reine(string name, Case pos, Color color) : base(name, pos, color)
+
+        public Reine(string name, (int, int) pos, Color color, bool life = true) : base(name, pos, color, life)
         {
-            fou = new Fou(name, pos, color);
-            tour = new Tour(name, pos, color);
+
         }
 
-        public override List<(int, int)> mouvement()
+        public override PieceBase clone()
+        {
+            return new Reine(name, position, color, alive);
+        }
+
+        public override PieceBase cloneWith(Move move)
+        {
+            (int row, int col) pos = move.To;
+            return new Reine(name, pos, color, alive);
+        }
+
+        public override List<(int, int)> generateMove(GameState state)
         {
             List<(int, int)> list = new List<(int, int)>();
-            list.AddRange(fou.mouvement());
-            list.AddRange(tour.mouvement());
-            return list;
-        }
+            int row = position.row;
+            int col = position.col;
 
-        public override List<(int, int)> mouvementGrid(Grid grid)
-        {
-            List<(int, int)> list = new List<(int, int)>();
-            list.AddRange(fou.mouvementGrid(grid));
-            list.AddRange(tour.mouvementGrid(grid));
-            return list;
-        }
+            int[,] index = new int[,] { { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 }, { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
+            int nx;
+            int ny;
 
-        public override List<(int, int)> MouvementToCase(Case next, Grid grid)
-        {
-            List<(int,int)> fouList = fou.MouvementToCase(next, grid);
-            List<(int,int)> tourList = tour.MouvementToCase(next, grid);
-
-            return fouList != null ? fouList : tourList != null ? tourList : null;
-        }
-
-        public override bool move(Case next, Grid grid)
-        {
-            if (contains(next, grid))
+            for (int j = 0; j < 8; j++)
             {
-                position.setPiece(null);
-                Console.Write(position);
+                nx = index[j, 0] + row;
+                ny = index[j, 1] + col;
 
-                if (!next.empty()) { next.getPiece().setAlive(false); }
+                while ((0 <= nx && nx < 8) && (0 <= ny && ny < 8))
+                {
 
-                next.setPiece(this);
+                    if (!state.board.grid[nx, ny].empty())
+                    {
+                        if (state.board.grid[nx, ny].piece.color != color) { list.Add((nx, ny)); }
 
-                position = next;
-                Console.Write(position);
+                        break;
+                    }
+                    list.Add((nx, ny));
+                    nx += index[j, 0];
+                    ny += index[j, 1];
 
-
-                fou.setPosition(next);
-                tour.setPosition(next);
-
-
-                return true;
+                }
             }
-            return false;
+            return list;
         }
+
     }
 }

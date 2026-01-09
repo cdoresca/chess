@@ -1,109 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace chess.Piece
+﻿namespace chess.Piece
 {
     internal class Tour : PieceBase
     {
-        public Tour(string name, Case pos, Color color) : base(name, pos, color)
+        public Tour(string name, (int, int) pos, Color color, bool life = true) : base(name, pos, color, life)
         {
         }
-        public override List<(int, int)> mouvement()
-        {
-            List<(int,int)> list = new List<(int, int)>();
-            int x=position.getIndex()[0];
-            int y=position.getIndex()[1];
-            
 
-            for (int i = 0; i < 8; i++) {
 
-                if (x!=i) { list.Add( ( x, i )); }
-                if (y!=i) { list.Add(( i, y )); }
-
-            }
-            return list;
-        }
-
-        public override List<(int, int)> mouvementGrid(Grid grid)
+        public override List<(int, int)> generateMove(GameState state)
         {
             List<(int, int)> list = new List<(int, int)>();
-            int x = position.getIndex()[0];
-            int y = position.getIndex()[1];
+            int row = position.row;
+            int col = position.col;
 
-            int[,] index = new int[,] { {1,0},{-1,0 },{ 0,1},{ 0,-1} };
-            int nx;
-            int ny;
-
-            for (int j=0; j<4;j++)
-            {
-                nx = index[j, 0] + x;
-                ny = index[j, 1] + y;
-
-                while ((0 <= nx && nx < 8) && (0 <= ny && ny < 8))
-                {
-
-                    if (!grid.getGrid()[nx, ny].empty())
-                    {
-                        if (grid.getGrid()[nx, ny].getPiece().GetColor() != color) { list.Add((nx, ny)); }
-                        break;
-                    }
-                    list.Add((nx,ny));
-                    nx += index[j, 0];
-                    ny += index[j, 1];
-                    
-                }
-            }
-            
-            return list;
-        }
-
-        public override List<(int, int)> MouvementToCase(Case next, Grid grid)
-        {
-           
-
-            List<(int, int)> list = new List<(int, int)>();
-            int x = position.getIndex()[0];
-            int y = position.getIndex()[1];
-
-            int[,] index = new int[,] { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
+            int[,] index = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
             int nx;
             int ny;
 
             for (int j = 0; j < 4; j++)
             {
-                nx = index[j, 0] + x;
-                ny = index[j, 1] + y;
+                nx = index[j, 0] + row;
+                ny = index[j, 1] + col;
 
                 while ((0 <= nx && nx < 8) && (0 <= ny && ny < 8))
                 {
 
-                    if (!grid.getGrid()[nx, ny].empty())
+                    if (!state.board.grid[nx, ny].empty())
                     {
-                        if (grid.getGrid()[nx, ny].getPiece().GetColor() != color) { list.Add((nx, ny)); }
-
-                        if (next == grid.getGrid()[nx, ny])
-                        {
-                            return list;
-                        }
+                        if (state.board.grid[nx, ny].piece.color != color) { list.Add((nx, ny)); }
+                        break;
                     }
                     list.Add((nx, ny));
-
-                    if (next == grid.getGrid()[nx, ny])
-                    {
-                        return list;
-                    }
                     nx += index[j, 0];
                     ny += index[j, 1];
 
                 }
-                list.Clear();
             }
 
-            return null;
+            return list;
+        }
 
+        public override PieceBase cloneWith(Move move)
+        {
+
+            (int row, int col) pos = move.To;
+            return new Tour(name, pos, color, alive);
+        }
+
+        public override PieceBase clone()
+        {
+            return new Tour(name, position, color, alive);
         }
     }
 }

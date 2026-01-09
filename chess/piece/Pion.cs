@@ -1,119 +1,91 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using chess;
-
-namespace chess.Piece
+﻿namespace chess.Piece
 {
     internal class Pion : PieceBase
     {
-        public Pion(string name, Case pos,Color color) : base(name, pos,color)
+        public Pion(string name, (int row, int col) pos, Color color, bool life = true) : base(name, pos, color, life)
         {
         }
 
-        public override List<(int, int)> mouvementGrid(Grid box)
+
+        public override List<(int, int)> generateMove(GameState state)
         {
             List<(int, int)> list = new List<(int, int)>();
-            int x = position.getIndex()[0];
-            int y = position.getIndex()[1];
+            foreach ((int row, int col) pos in straight())
+            {
+                if (state.board.grid[pos.row, pos.col].empty())
+                    list.Add((pos.row, pos.col));
 
-            foreach(var (i,j) in mouvement()){
+                if (!state.board.grid[pos.row, pos.col].empty()) break;
 
-                if ((i == x-1 || i == x + 1) && j==y && box.getGrid()[i,j].empty())
-                {
-                    list.Add((i,j));
-                }
-                else if (j!=y && !box.getGrid()[i, j].empty()) { 
-
-                    if(box.getGrid()[i, j].getPiece().GetColor()!=color){ 
-                        list.Add((i, j)); }
-                }
-                else if ((i == x - 2 || i == x + 2) && box.getGrid()[i, j].empty())
-                {
-                    list.Add((i, j));
-                }
             }
+
+            foreach ((int row, int col) pos in kill())
+            {
+                if (!state.board.grid[pos.row, pos.col].empty() && color != state.board.grid[pos.row, pos.col].piece.color)
+                    list.Add((pos.row, pos.col));
+            }
+
             return list;
         }
 
-        public override List<(int, int)> mouvement()
+        private List<(int, int)> straight()
         {
-            List < (int,int) > list = new List<(int, int)>();
+            List<(int, int)> list = new List<(int, int)>();
 
-            int x = position.getIndex()[0];
-            int y = position.getIndex()[1];
+            int row = position.row;
+            int col = position.col;
 
-            if (color == Color.WHITE)
-            {
-                if(x< 7) {
+            int direction = color == Color.WHITE ? -1 : 1;
 
-                    list.Add((x-1,y));
+            int oneStep = row + direction;
+            if (oneStep >= 0 && oneStep < 8) list.Add((oneStep, col));
 
-                    if (x == 6) { list.Add(( x - 2, y )); }
-                }
+            int start = color == Color.WHITE ? 6 : 1;
+            if (start != row) return list;
+            int twoStep = row + 2 * direction;
+            list.Add((twoStep, col));
 
-                if (y>0) { 
-                    list.Add(( x - 1, y-1 ));
-                }
-                if(y<7)
-                {
-                    list.Add(( x - 1, y + 1));
-                }
-            } 
-            if (color == Color.BLACK)
-            {
-                if(x > 0) {
 
-                    list.Add((x+1,y));
 
-                    if (x == 1) { list.Add( (x + 2, y) ); }
-                }
-
-                if (y>0) { 
-                    list.Add( (x + 1, y-1 ));
-                }
-                if(y<7)
-                {
-                    list.Add( (x + 1, y + 1));
-                }
-            }
-           
             return list;
         }
 
-        
-
-        public override List<(int, int)> MouvementToCase(Case next,Grid box)
+        private List<(int, int)> kill()
         {
-           
-            int x = position.getIndex()[0];
-            int y = position.getIndex()[1];
+            List<(int, int)> list = new List<(int, int)>();
 
-            foreach (var (i, j) in mouvement())
+            int row = position.row;
+            int col = position.col;
+
+            int direction = color == Color.WHITE ? -1 : 1;
+
+            int nextRow = row + direction;
+
+            if (nextRow < 0 || nextRow > 7)
+                return list;
+
+            if (col > 0)
             {
-
-                if ((i == x - 1 || i == x + 1) && j == y && box.getGrid()[i, j].empty())
-                {
-                   return [(i, j)];
-                }
-                else if (j != y && !box.getGrid()[i, j].empty())
-                {
-
-                    if (box.getGrid()[i, j].getPiece().GetColor() != color)
-                    {
-                        return[(i, j)];
-                    }
-                }
-                else if ((i == x - 2 || i == x + 2) && box.getGrid()[i, j].empty())
-                {
-                    return i == x - 2?[(i-1,j),(i, j)]: [(i + 1, j), (i, j)];
-                }
+                list.Add((nextRow, col - 1));
+            }
+            if (col < 7)
+            {
+                list.Add((nextRow, col + 1));
             }
 
-            return null;
 
+            return list;
+        }
+
+        public override PieceBase cloneWith(Move move)
+        {
+            (int row, int col) pos = move.To;
+            return new Pion(name, pos, color, alive);
+        }
+
+        public override PieceBase clone()
+        {
+            return new Pion(name, position, color, alive);
         }
     }
 }

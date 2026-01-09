@@ -1,64 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace chess.Piece
+﻿namespace chess.Piece
 {
     internal class Fou : PieceBase
     {
-        public Fou(string name, Case pos, Color color) : base(name, pos, color)
+        public Fou(string name, (int, int) pos, Color color, bool life = true) : base(name, pos, color, life)
         {
         }
 
-        
-        public override List<(int, int)> mouvement()
-        {
-            List<(int,int)> list = new List<(int, int)>();
-
-            int x = position.getIndex()[0];
-            int y = position.getIndex()[1];
-
-            for (int i = 1; i < 8; i++) {
-                int[,] index = new int[,] { {-i,-i},{-i,i},{ i,-i},{ i,i} };
-
-                for(int j=0; j<4;j++)
-                {
-                    int nx=index[j,0]+x;
-                    int ny=index[j,1]+y;
-
-                    if ((0 <= nx && nx<8)&& (0 <= ny && ny < 8)) {
-
-                        list.Add((nx,ny));
-                    }
-                }
-            }
-
-            return list;
-        }
-
-        public override List<(int, int)> mouvementGrid(Grid grid)
+        public override List<(int, int)> generateMove(GameState state)
         {
             List<(int, int)> list = new List<(int, int)>();
-            int x = position.getIndex()[0];
-            int y = position.getIndex()[1];
-            
-            int[,] index = new int[,] { { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
+            int row = position.row;
+            int col = position.col;
+
+            int[,] index = { { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
             int nx;
             int ny;
 
             for (int j = 0; j < 4; j++)
             {
-                nx = index[j, 0] + x;
-                ny = index[j, 1] + y;
+                nx = index[j, 0] + row;
+                ny = index[j, 1] + col;
 
                 while ((0 <= nx && nx < 8) && (0 <= ny && ny < 8))
                 {
 
-                    if (!grid.getGrid()[nx, ny].empty())
+                    if (!state.board.grid[nx, ny].empty())
                     {
-                        if (grid.getGrid()[nx, ny].getPiece().GetColor() != color) { list.Add((nx, ny)); }
+                        if (state.board.grid[nx, ny].piece.color != color) { list.Add((nx, ny)); }
 
                         break;
                     }
@@ -71,51 +39,16 @@ namespace chess.Piece
             return list;
         }
 
-        public override List<(int, int)> MouvementToCase(Case next, Grid grid)
+        public override PieceBase cloneWith(Move move)
         {
-          
+            (int row, int col) pos = move.To;
+            return new Fou(name, pos, color, alive);
+        }
 
-            List<(int, int)> list = new List<(int, int)>();
-            int x = position.getIndex()[0];
-            int y = position.getIndex()[1];
-
-            int[,] index = new int[,] { { 1, 1 }, { -1, -1 }, { -1, 1 }, { 1, -1 } };
-            int nx;
-            int ny;
-
-            for (int j = 0; j < 4; j++)
-            {
-                nx = index[j, 0] + x;
-                ny = index[j, 1] + y;
-
-                while ((0 <= nx && nx < 8) && (0 <= ny && ny < 8))
-                {
-
-                    if (!grid.getGrid()[nx, ny].empty())
-                    {
-                        if (grid.getGrid()[nx, ny].getPiece().GetColor() != color) { list.Add((nx, ny)); }
-
-                        if (next == grid.getGrid()[nx, ny])
-                        {
-                            return list;
-                        }
-                    }
-                    list.Add((nx, ny));
-
-                    if (next == grid.getGrid()[nx, ny])
-                    {
-                        return list;
-                    }
-                    nx += index[j, 0];
-                    ny += index[j, 1];
-
-                }
-                list.Clear();
-            }
-
-            return null;
-
+        public override PieceBase clone()
+        {
+            return new Fou(name, position, color, alive);
         }
     }
-    
+
 }
