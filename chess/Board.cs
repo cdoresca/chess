@@ -36,7 +36,8 @@ namespace chess
                     newCells[i, j] = new Case(
                         oldCase.column,
                         oldCase.row,
-                        oldCase.piece
+                        oldCase.piece?.clone()
+
                     );
                 }
             }

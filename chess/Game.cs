@@ -1,4 +1,5 @@
 ﻿
+using chess.IA;
 using chess.Piece;
 using chess.UI;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -36,8 +37,9 @@ namespace chess
             state = new GameState(new Board(), new PlayerState(whitePiece), new PlayerState(blackPiece), Color.WHITE);
             console = new ConsoleUI();
 
-            white = new Player(Color.WHITE,console);
-            black = new Player(Color.BLACK,console);
+           // white = new Player(Color.WHITE,console);
+            white = new Agent(Color.WHITE, console, new AlphaBeta(Color.WHITE));
+            black = new Agent(Color.BLACK,console,new AlphaBeta(Color.BLACK));
         }
         public void MakePieceWhite()
         {
@@ -116,5 +118,7 @@ namespace chess
             else { Console.ForegroundColor = ConsoleColor.White; }
 
         }
+
+        public static Color opponent(Color color) { return color == Color.BLACK ? Color.WHITE : Color.BLACK;}
     }
 }

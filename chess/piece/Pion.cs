@@ -2,8 +2,13 @@
 {
     internal class Pion : PieceBase
     {
+        int dir;
+
+    
         public Pion(string name, (int row, int col) pos, Color color, bool life = true) : base(name, pos, color, life)
         {
+            dir = color == Color.WHITE ? -1 : 1;
+            
         }
 
 
@@ -35,14 +40,13 @@
             int row = position.row;
             int col = position.col;
 
-            int direction = color == Color.WHITE ? -1 : 1;
 
-            int oneStep = row + direction;
+            int oneStep = row + dir;
             if (oneStep >= 0 && oneStep < 8) list.Add((oneStep, col));
 
             int start = color == Color.WHITE ? 6 : 1;
             if (start != row) return list;
-            int twoStep = row + 2 * direction;
+            int twoStep = row + 2 * dir;
             list.Add((twoStep, col));
 
 
@@ -57,9 +61,7 @@
             int row = position.row;
             int col = position.col;
 
-            int direction = color == Color.WHITE ? -1 : 1;
-
-            int nextRow = row + direction;
+            int nextRow = row + dir;
 
             if (nextRow < 0 || nextRow > 7)
                 return list;
@@ -80,6 +82,11 @@
         public override PieceBase cloneWith(Move move)
         {
             (int row, int col) pos = move.To;
+
+            int rowEnd = color == Color.WHITE ? 0 : 7;
+
+            if(rowEnd == pos.row) return new Reine(name, pos, color);
+
             return new Pion(name, pos, color, alive);
         }
 

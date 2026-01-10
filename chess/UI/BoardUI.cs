@@ -2,7 +2,7 @@
 {
     internal class BoardUI
     {
-        public CaseUI[,] board { get; }
+        CaseUI[,] board;
         int col, row;
         public BoardUI(int row = 8, int col = 8)
         {
@@ -94,5 +94,12 @@
                 }
             }
         }
+
+        public CaseUI this[int row,int col ]
+        {
+            get => board[row,col];
+            set => board[row, col] = value;
+        }
+
     }
 }

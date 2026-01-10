@@ -4,9 +4,9 @@
     internal abstract class PieceBase
     {
         public string name { get; }
-        public (int row, int col) position { get; }
+        public (int row, int col) position { get; set; }
         public Color color { get; }
-        public bool alive { get; }
+        public bool alive { get; set; }
 
         public PieceBase(string name, (int row, int col) pos, Color color, bool life = true)
         {

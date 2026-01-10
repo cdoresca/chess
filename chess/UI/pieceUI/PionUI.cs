@@ -13,5 +13,12 @@ namespace chess.UI.pieceUI
             symbole = "P";
         
         }
+        public override string ToString()
+        {
+            int rowEnd = color == Color.WHITE ? 0 : 7;
+             if(rowEnd == position.row) symbole = "Q";
+            Game.colorFront(color);
+            return symbole;
+        }
     }
 }

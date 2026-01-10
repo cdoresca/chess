@@ -20,7 +20,7 @@
 
         public Case cloneWithPiece(PieceBase p)
         {
-            return new Case(column, row, p);
+            return new Case(column, row, p?.clone());
         }
     }
 

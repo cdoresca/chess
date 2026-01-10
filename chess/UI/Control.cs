@@ -27,15 +27,15 @@ namespace chess.UI
             else { cases.First().sousSelection(); }
 
 
-            board.board[origin[0], origin[1]].selectionner();
-            cases.Push(board.board[origin[0], origin[1]]);
+            board[origin[0], origin[1]].selectionner();
+            cases.Push(board[origin[0], origin[1]]);
 
         }
 
         public Move keyboard(GameState state)
         {
             CaseUI select = null;
-            cases.Push(board.board[origin[0], origin[1]]);
+            cases.Push(board[origin[0], origin[1]]);
 
             while (true)
             {
@@ -72,12 +72,12 @@ namespace chess.UI
                    
                     if(select == null)
                     {
-                        if(board.board[origin[0], origin[1]].empty()) { continue; }
-                        if(board.board[origin[0], origin[1]].piece.color != color) { continue; }
+                        if(board[origin[0], origin[1]].empty()) { continue; }
+                        if(board[origin[0], origin[1]].piece.color != color) { continue; }
 
                         cases.Pop();
 
-                        select = board.board[origin[0], origin[1]];
+                        select = board[origin[0], origin[1]];
                         List<PieceBase> pieces = state.GenerateLegalPiece();
                         PieceBase piece = console.isLegalPiece(pieces, select.piece);
                         if(piece != null)
@@ -87,16 +87,16 @@ namespace chess.UI
                             
                     }
 
-                    else if(select == board.board[origin[0], origin[1]])
+                    else if(select == board[origin[0], origin[1]])
                     {
                         select = null;
                         board.clear();
-                        cases.Push(board.board[origin[0], origin[1]]);
+                        cases.Push(board[origin[0], origin[1]]);
                         
                     }
                     else if(state.isLegalMove(new Move((select.row,select.col),(origin[0], origin[1]))))
                     {
-                        select.piece.move(board.board[origin[0], origin[1]], board);
+                        select.piece.move(board[origin[0], origin[1]]);
                         board.clear();
 
                         return new Move((select.row, select.col), (origin[0], origin[1]));
@@ -106,6 +106,14 @@ namespace chess.UI
                 }
             }
 
+        }
+
+        public void agentMove(GameState state,Move move)
+        {
+            (int row, int col) from = move.From;
+            (int row, int col) to = move.To;
+            board[from.row, from.col].piece.move(board[to.row, to.col]);
+            Console.Write(board[to.row,to.col]);
         }
 
         public void mouse()

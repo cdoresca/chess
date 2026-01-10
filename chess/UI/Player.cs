@@ -1,16 +1,18 @@
-﻿namespace chess.UI
+﻿using chess.UI;
+
+namespace chess
 {
     internal class Player
     {
-        Color color;
-        Control control;
+        protected Color color;
+        protected Control control;
         public Player(Color c,  ConsoleUI console)
         {
             color = c;
             control = new Control(console, c);
         }
 
-        public Move play(GameState state) 
+        public virtual Move play(GameState state) 
         { 
             return control.keyboard(state);
         }

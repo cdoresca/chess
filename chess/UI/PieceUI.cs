@@ -6,7 +6,7 @@ namespace chess.UI
     {
         public String name { get; }
         protected String symbole;
-        CaseUI position;
+        protected CaseUI position;
         public Color color { get; }
         bool alive {  get; set; }
         public PieceUI(String name, CaseUI pos,Color color,bool life = true) 
@@ -20,7 +20,7 @@ namespace chess.UI
             Game.colorFront(color); 
             return symbole; 
         }
-        public void move(CaseUI next, BoardUI grid)
+        public void move(CaseUI next)
         {
             position.setPiece(null);
             Console.Write(position);

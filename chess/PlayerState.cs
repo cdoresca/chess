@@ -5,12 +5,13 @@ namespace chess
     internal class PlayerState
     {
         public List<PieceBase> pieces { get; }
-        public Roi roi { get; }
+        public Roi roi => pieces.OfType<Roi>().First();
+
 
         public PlayerState(List<PieceBase> p)
         {
             pieces = p;
-            roi = pieces.OfType<Roi>().First();
+            
         }
         public PlayerState clone()
         {
@@ -28,14 +29,31 @@ namespace chess
         {
             for (int i = 0; i < pieces.Count; i++)
             {
-                if (pieces[i].name == updated.name)
+                if (pieces[i].name == updated.name)   
                 {
+                    // On met à jour l'objet existant
                     pieces[i] = updated;
+                    
+                    
                     return;
                 }
             }
-
         }
+
+        public void RemovePiece(PieceBase piece)
+        {
+            for (int i = 0; i < pieces.Count; i++)
+            {
+                if (pieces[i].position == piece.position)  
+                {
+                    
+                    pieces.RemoveAt(i);
+
+                    return;
+                }
+            }
+        }
+
     }
 
 }

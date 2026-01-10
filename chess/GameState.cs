@@ -20,14 +20,17 @@
             (int row, int col) to = move.To;
 
             GameState newState = clone();
+           
 
             PieceBase newPiece = newState.board.grid[from.row, from.col].piece.cloneWith(move);
 
             newState.board = newState.board.CloneWithMove(move, newPiece);
-            newState.black.UpdatePiece(newPiece);
-            newState.white.UpdatePiece(newPiece);
+            
 
             newState.turn = turn == Color.WHITE ? Color.BLACK : Color.WHITE;
+
+            newState.getPlayer(turn).UpdatePiece(newPiece);
+            newState.getPlayer(Game.opponent(turn)).RemovePiece(newPiece);
 
             return newState;
         }
@@ -133,6 +136,30 @@
 
         }
 
+        public List<Move> GenerateLegalMove()
+        {
+
+            PlayerState player = getPlayer(turn);
+
+            List<Move> moves = new List<Move>();
+
+            foreach (PieceBase piece in player.pieces)
+            {
+                if (!piece.alive) continue;
+                foreach ((int row, int col) to in piece.generateMove(this))
+                {
+                    Move move = new Move(piece.position, to);
+
+                    GameState newState = this.ApplyMove(move);
+                    if (!newState.check(turn))
+                    {
+                        moves.Add(move);
+                        
+                    }
+                }
+            }
+            return moves;
+        }
         public List<Move> GenerateLegalMove(Color color)
         {
 
@@ -151,7 +178,7 @@
                     if (!newState.check(color))
                     {
                         moves.Add(move);
-                        
+
                     }
                 }
             }
@@ -175,7 +202,18 @@
             return moves;
         }
 
-        public bool isLegalMove(Move move) { return GenerateLegalMove(turn).Contains(move); }
+        public List<(Move,GameState)> Successors()
+        {
+            List<(Move, GameState)> nextState = new List<(Move, GameState)>();
+
+            foreach(var move in GenerateLegalMove())
+            {
+                nextState.Add((move,ApplyMove(move)));
+            }
+            return nextState;
+        }
+
+        public bool isLegalMove(Move move) { return GenerateLegalMove().Contains(move); }
         public PlayerState getPlayer(Color color) { return color == Color.WHITE ? white : black; }
     }
 }
